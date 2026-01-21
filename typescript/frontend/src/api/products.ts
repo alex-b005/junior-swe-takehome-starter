@@ -1,4 +1,4 @@
-import { Product, PaginatedResponse } from '../types/Product.js';
+import { Product, PaginatedResponse } from '../types/Product';
 
 const API_BASE = 'http://localhost:3000/api';
 
@@ -57,13 +57,21 @@ export async function createProduct(
   inStock: boolean
 ): Promise<Product> {
   // TODO: Implement createProduct
-  // Make a POST request to /api/products
-  // Send name, price, inStock in the request body
-  // Return the created product
-  // Handle errors (bad request, validation errors, etc.)
-  throw new Error('Not implemented yet');
-}
+  const response = await fetch(`${API_BASE}/products`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, price, inStock }),
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to create product');
+  }
+
+  return response.json();
+}
 /**
  * Toggle the saved status of a product
  *
@@ -72,11 +80,17 @@ export async function createProduct(
  */
 export async function toggleSaved(productId: number): Promise<Product> {
   // TODO: Implement toggleSaved
-  // Make a PATCH request to /api/products/:id/saved
-  // Return the updated product
-  // Handle errors (product not found, etc.)
-  throw new Error('Not implemented yet');
-}
+  const response = await fetch(`${API_BASE}/products/${productId}/saved`, {
+      method: 'PATCH',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to toggle saved');
+    }
+
+    return response.json();
+  }
 
 /**
  * Delete a product

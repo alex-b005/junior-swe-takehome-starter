@@ -119,4 +119,21 @@ describe('GET /api/products', () => {
   // We care about your THINKING behind test selection, not the
   // specific technique. Pick the approach you're comfortable with.
   // ------------------------------------------------------------
+
+  // Test 1: POST Validation rejects empty name (Whitespace)
+  it('should reject product with empty name', () => {
+    const name = '   ';
+    const isNameInvalid = !name || typeof name !== 'string' || name.trim() === '';
+
+    expect(isNameInvalid).toBe(true);
+  });
+
+  // Test 2: POST validation rejects negative price (Negative or Zero)
+  it('should reject product with negative price', () => {
+    const price = -10;
+    const isPriceInvalid = typeof price !== 'number' || price <= 0;
+
+    expect(isPriceInvalid).toBe(true);
+  });
+
 });

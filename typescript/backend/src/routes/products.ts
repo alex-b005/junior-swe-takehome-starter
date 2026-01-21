@@ -84,13 +84,33 @@ router.get('/', (req: Request, res: Response) => {
  * - saved: false
  */
 router.post('/', (req: Request, res: Response) => {
+  const { name, price, inStock } = req.body;
+
   // TODO: Implement POST logic
   // Check that name is provided and not just whitespace
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res.status(400).json({ error: 'Name is required and cannot be empty' });
+  }
+
   // Check that price is a positive number
+  if (typeof price !== 'number' || price <= 0) {
+    return res.status(400).json({ error: 'Price must be a positive number' });
+  }
+
   // Create new product with auto-generated id and saved=false
+  const newProduct: Product = {
+    id: getNextId(),
+    name: name.trim(),
+    price: price,
+    inStock: Boolean(inStock),
+    saved: false,
+  };
+
   // Add to products array
+  products.push(newProduct);
+
   // Return the created product or error response
-  res.status(501).json({ error: 'Not implemented yet' });
+  return res.status(201).json(newProduct);
 });
 
 /**
@@ -104,11 +124,23 @@ router.post('/', (req: Request, res: Response) => {
 router.patch('/:id/saved', (req: Request, res: Response) => {
   // TODO: Implement PATCH logic
   // Parse id from params
+  const id = parseInt(req.params.id);
+
   // Find product with that id
-  // If found: flip saved, return updated product
-  // If not found: return error response
-  res.status(501).json({ error: 'Not implemented yet' });
+  const product = products.find(p => p.id === id);
+
+  // If not found: return error response (CHECK FIRST!)
+  if (!product) {
+    return res.status(404).json({error: 'Product not found'});
+  }
+
+  // If found: flip saved, return updated product (THEN do this)
+  product.saved = !product.saved;
+
+  return res.json(product);
 });
+
+
 
 /**
  * DELETE /api/products/:id
@@ -121,10 +153,20 @@ router.patch('/:id/saved', (req: Request, res: Response) => {
 router.delete('/:id', (req: Request, res: Response) => {
   // TODO: Implement DELETE logic
   // Parse id from params
+  const id = parseInt(req.params.id);
+
   // Find product with that id
-  // If found: remove from array, return success message
+  const productIndex = products.findIndex(p => p.id === id);
+
   // If not found: return error response
-  res.status(501).json({ error: 'Not implemented yet' });
+  if (productIndex === -1) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+
+  // If found: remove from array, return success message
+  products.splice(productIndex, 1);
+
+  return res.json({ message: 'Product deleted successfully' });
 });
 
 export default router;
